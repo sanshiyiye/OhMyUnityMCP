@@ -21,6 +21,9 @@ using Microsoft.Extensions.Logging;
 using R3;
 using UnityEngine;
 using UnityEngine.UIElements;
+#if !UNITY_2022_3_OR_NEWER
+using IntegerField = UnityEditor.UIElements.IntegerField;
+#endif
 using static com.IvanMurzak.McpPlugin.Common.Consts.MCP.Server;
 using LogLevel = com.IvanMurzak.Unity.MCP.Runtime.Utils.LogLevel;
 

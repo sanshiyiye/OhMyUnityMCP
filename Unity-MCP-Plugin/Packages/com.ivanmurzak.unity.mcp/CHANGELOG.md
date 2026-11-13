@@ -2,6 +2,13 @@
 
 ## [Unreleased]
 
+### Compatibility
+
+- Unity 2021.3 compatibility: guarded Unity 2022.3-only Overlay, Material Variant, removed-Prefab-object,
+  loaded-scene-count, and global texture-mipmap APIs; restored the legacy `IntegerField` namespace and declared
+  Unity 2021.3 as the minimum package version. Material Variant metadata, removed Prefab child reporting, and the
+  newer texture-limit API remain unavailable on Unity 2021.3.
+
 ### Added
 
 - Extensions section of the main window: **Install All** (installs every extension not installed yet) and **Update All**

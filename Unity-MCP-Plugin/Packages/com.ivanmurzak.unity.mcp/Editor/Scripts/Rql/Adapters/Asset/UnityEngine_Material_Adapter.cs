@@ -27,9 +27,14 @@ namespace com.IvanMurzak.Unity.MCP.Editor.Rql.Adapters
     /// </summary>
     public sealed class UnityEngine_Material_Adapter : RqlTypeAdapter<Material>
     {
+#if UNITY_2022_3_OR_NEWER
         public override string Description => "Material: shader properties via properties[\"_Name\"] (colors, vectors, floats, textures, ints), " +
                                                "the main color / texture as color / mainTexture; a Material Variant: set parent = unity.asset(\"….mat\"); " +
                                                $"write as a ref, an asset path, or a built-in material's name ({BuiltinNames})";
+#else
+        public override string Description => "Material: shader properties via properties[\"_Name\"] (colors, vectors, floats, textures, ints), " +
+                                               $"the main color / texture as color / mainTexture; write as a ref, an asset path, or a built-in material's name ({BuiltinNames})";
+#endif
 
         /// <summary>The material a new primitive gets (the render pipeline's default), by this name.</summary>
         internal const string DefaultMaterialName = "Default-Material";
@@ -92,9 +97,12 @@ namespace com.IvanMurzak.Unity.MCP.Editor.Rql.Adapters
             m.Untyped.AddMixedMap("properties", o => Keys((Material)o), (o, k) => EntryType((Material)o, k),
                 (o, k) => Get((Material)o, k), (o, k, v) => Set((Material)o, k, v), (o, k, v) => Validate((Material)o, k, v),
                 "shader properties by name", has: (o, k) => ((Material)o).HasProperty(k));
+#if UNITY_2022_3_OR_NEWER
             m.Add<Material?>("parent", o => o.parent, (o, v) => o.parent = v, (o, v) => ValidateParent(o, v),
                     "the material this one is a Material Variant of (it takes the parent's shader; properties set on it become overrides); null = a plain material")
-             .Add<bool>("isVariant", o => o.isVariant, description: "true when this material is a Material Variant (has a parent)")
+             .Add<bool>("isVariant", o => o.isVariant, description: "true when this material is a Material Variant (has a parent)");
+#endif
+            m
              .Add<Color?>("color", o => MainColor(o) is { } p ? o.GetColor(p) : (Color?)null,
                  (o, v) => o.SetColor(MainColor(o) ?? throw new InvalidOperationException(NoMain(o, ShaderPropertyType.Color)), v!.Value),
                  (o, v) => v == null ? "color cannot be null"
@@ -153,6 +161,7 @@ namespace com.IvanMurzak.Unity.MCP.Editor.Rql.Adapters
             return $"{head}: set one of {which} by name, properties[\"{names[0]}\"] ({RqlEditorApi.Preview(names)})";
         }
 
+#if UNITY_2022_3_OR_NEWER
         // Unity ignores a parent that would make a cycle (it logs an error and keeps the old one): refused before any write.
         internal static string? ValidateParent(Material material, Material? parent)
         {
@@ -162,6 +171,7 @@ namespace com.IvanMurzak.Unity.MCP.Editor.Rql.Adapters
                     return $"'{parent!.name}' is already a variant of '{material.name}' (directly or through its parents): a cycle";
             return null;
         }
+#endif
 
         private static IEnumerable<string> Keys(Material m)
         {
