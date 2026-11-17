@@ -62,7 +62,11 @@ namespace com.IvanMurzak.Unity.MCP.Editor.Rql.AssetStore
         /// Test seam: what opens Unity's sign-in (tests replace it so no sign-in UI ever opens). Deferred to the next Editor
         /// update, so a modal window it opens never holds the agent's call until the user answers it.
         /// </summary>
-        internal static Action ShowLogin = () => AssetStoreEditorUpdate.Next(CloudProjectSettings.ShowLogin);
+#if UNITY_2022_3_OR_NEWER
+        internal static Action? ShowLogin = () => AssetStoreEditorUpdate.Next(CloudProjectSettings.ShowLogin);
+#else
+        internal static Action? ShowLogin = null;
+#endif
 
         /// <summary>Test seam: the Editor runs without a window (-batchmode), where no sign-in UI can appear.</summary>
         internal static Func<bool> IsBatchMode = () => Application.isBatchMode;
@@ -111,6 +115,14 @@ namespace com.IvanMurzak.Unity.MCP.Editor.Rql.AssetStore
                            "project through the Hub: unity-mcp-cli close <project> and unity-mcp-cli open <project> (it starts the " +
                            "Editor through Unity Hub when the Hub is installed; otherwise install Unity Hub first), or open it from " +
                            "Unity Hub. An Editor opened so takes the account the Hub is signed in to; if still signed out, call SignIn() again"
+                };
+            }
+            if (ShowLogin == null)
+            {
+                return new AssetStoreSignIn
+                {
+                    next = "this Unity version has no public API to open sign-in. Sign in manually through Unity Hub or the " +
+                           "Editor's Account menu (top right); the agent never types credentials. Check the result with " + CheckAfter
                 };
             }
             ShowLogin();

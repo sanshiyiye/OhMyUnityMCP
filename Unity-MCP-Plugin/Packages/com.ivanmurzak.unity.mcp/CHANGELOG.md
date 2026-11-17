@@ -4,6 +4,14 @@
 
 ### Compatibility
 
+- Unity 2021.3 follow-up: use `UnityEditor.UIElements.IntegerField` UXML factories for both timeout
+  inputs so AI Game Dev opens without factory errors or the resulting null reference. The C# alias
+  alone does not change UXML namespace resolution.
+- Expose `settings.physics.simulationMode` only on Unity 2022.2 and newer, where `SimulationMode`
+  and `Physics.simulationMode` are available.
+- Use the public Asset Store sign-in opener only on Unity 2022.3 and newer; older Editors return
+  manual sign-in instructions instead of referencing `CloudProjectSettings.ShowLogin` or reporting
+  that a sign-in window opened.
 - Unity 2021.3 compatibility: guarded Unity 2022.3-only Overlay, Material Variant, removed-Prefab-object,
   loaded-scene-count, and global texture-mipmap APIs; restored the legacy `IntegerField` namespace and declared
   Unity 2021.3 as the minimum package version. Material Variant metadata, removed Prefab child reporting, and the
